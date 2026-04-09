@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Music, Calendar, Mail, FileText, Play, Pause, Volume2, Instagram, Youtube, Twitter, ExternalLink, Phone, MessageSquare } from 'lucide-react';
+import { Music, Calendar, Mail, FileText, Play, Pause, Volume2, Instagram, Youtube, Twitter, ExternalLink, Phone, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 // =============================================================================
@@ -43,7 +43,7 @@ export const Hero = () => {
             <a href="#listen" className="px-8 py-3 bg-piano-gold text-piano-ebony font-medium rounded-full hover:bg-white transition-colors">
               Listen to Demos
             </a>
-            <a href="#epk" className="px-8 py-3 border border-piano-ivory/30 rounded-full hover:bg-piano-ivory hover:text-piano-ebony transition-all">
+            <a href="#contact" className="px-8 py-3 border border-piano-ivory/30 rounded-full hover:bg-piano-ivory hover:text-piano-ebony transition-all">
               Session Inquiries
             </a>
           </div>
@@ -67,44 +67,87 @@ export const Listen = () => {
     { title: "Midnight Nocturne", type: "Solo Piano", duration: "4:32" },
     { title: "Neon Pulse", type: "Synth Exploration", duration: "3:15" },
     { title: "Ethereal Echoes", type: "Ambient Keys", duration: "5:10" },
-    { title: "Classical Fusion", type: "Orchestral Hybrid", duration: "4:45" },
   ];
-// ... rest of the file ...
+
+  const [playingIndex, setPlayingIndex] = React.useState<number | null>(null);
+  const [progress, setProgress] = React.useState(0);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+
+  React.useEffect(() => {
+    let interval: any;
+    if (playingIndex !== null) {
+      interval = setInterval(() => {
+        if (audioRef.current) {
+          const p = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+          setProgress(p || 0);
+        }
+      }, 100);
+    }
+    return () => clearInterval(interval);
+  }, [playingIndex]);
+
+  const handlePlay = (index: number) => {
+    if (playingIndex === index) {
+      audioRef.current?.pause();
+      setPlayingIndex(null);
+    } else {
+      if (audioRef.current) {
+        audioRef.current.src = `/${tracks[index].title}.mp3`; 
+        audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+        setPlayingIndex(index);
+      }
+    }
+  };
 
   return (
     <section id="listen" className="py-24 px-6 max-w-6xl mx-auto piano-pattern">
+      <audio ref={audioRef} onEnded={() => setPlayingIndex(null)} />
       <div className="flex flex-col md:flex-row gap-16 items-start">
         <div className="w-full md:w-1/3 md:sticky md:top-24">
           <h2 className="text-4xl font-serif mb-6">The Sound</h2>
           <p className="text-piano-ebony/60 leading-relaxed mb-8">
             A curated selection of works spanning classical piano compositions to avant-garde synthesizer soundscapes.
           </p>
-          <div className="p-8 bg-piano-ebony text-piano-ivory rounded-2xl shadow-2xl">
+          <div className="p-8 bg-piano-ebony text-piano-ivory rounded-2xl shadow-2xl border border-piano-gold/20">
             <div className="flex items-center justify-between mb-8">
               <Music className="text-piano-gold" />
-              <Volume2 size={20} className="text-piano-ivory/40" />
+              <Volume2 size={20} className={cn("transition-opacity", playingIndex !== null ? "opacity-100 animate-pulse" : "opacity-40")} />
             </div>
-            <div className="mb-6">
-              <div className="text-xs text-piano-gold uppercase tracking-widest mb-1">Now Playing</div>
-              <div className="text-xl font-serif">Midnight Nocturne</div>
-              <div className="text-sm text-piano-ivory/60">Solo Piano</div>
+            <div className="mb-6 h-20 flex flex-col justify-center">
+              {playingIndex !== null ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="text-xs text-piano-gold uppercase tracking-widest mb-1">Now Playing</div>
+                  <div className="text-xl font-serif truncate">{tracks[playingIndex].title}</div>
+                  <div className="text-sm text-piano-ivory/60">{tracks[playingIndex].type}</div>
+                </motion.div>
+              ) : (
+                <div className="text-piano-ivory/20 italic text-sm">
+                  Select a track to begin listening
+                </div>
+              )}
             </div>
             <div className="space-y-4">
               <div className="h-1 bg-piano-ivory/10 rounded-full overflow-hidden">
                 <motion.div 
-                  initial={{ width: 0 }}
-                  whileInView={{ width: "45%" }}
+                  animate={{ width: `${progress}%` }}
                   className="h-full bg-piano-gold"
                 />
               </div>
               <div className="flex justify-between text-[10px] text-piano-ivory/40 uppercase tracking-tighter">
-                <span>1:42</span>
-                <span>4:32</span>
+                <span>{playingIndex !== null && audioRef.current ? Math.floor(audioRef.current.currentTime / 60) + ":" + Math.floor(audioRef.current.currentTime % 60).toString().padStart(2, '0') : "0:00"}</span>
+                <span>{playingIndex !== null ? tracks[playingIndex].duration : "0:00"}</span>
               </div>
             </div>
             <div className="flex items-center justify-center gap-8 mt-8">
-              <button className="text-piano-ivory/60 hover:text-piano-ivory transition-colors">
-                <Play size={24} fill="currentColor" />
+              <button 
+                onClick={() => playingIndex !== null && handlePlay(playingIndex)}
+                className="w-12 h-12 rounded-full bg-piano-gold text-piano-ebony flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-piano-gold/20 disabled:opacity-50"
+                disabled={playingIndex === null}
+              >
+                {playingIndex !== null ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
               </button>
             </div>
           </div>
@@ -117,18 +160,28 @@ export const Listen = () => {
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="group flex items-center justify-between p-6 rounded-xl border border-piano-ebony/5 hover:border-piano-gold/30 hover:bg-white transition-all cursor-pointer"
+              onClick={() => handlePlay(i)}
+              className={cn(
+                "group flex items-center justify-between p-6 rounded-xl border transition-all cursor-pointer",
+                playingIndex === i 
+                  ? "border-piano-gold bg-piano-gold/5 shadow-inner" 
+                  : "border-piano-ebony/5 hover:border-piano-gold/30 hover:bg-white"
+              )}
             >
               <div className="flex items-center gap-6">
                 <span className="text-sm font-serif text-piano-ebony/20">0{i + 1}</span>
                 <div>
-                  <h3 className="font-medium text-lg group-hover:text-piano-gold transition-colors">{track.title}</h3>
+                  <h3 className={cn("font-medium text-lg transition-colors", playingIndex === i ? "text-piano-gold" : "group-hover:text-piano-gold")}>{track.title}</h3>
                   <p className="text-sm text-piano-ebony/40">{track.type}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-xs text-piano-ebony/40 font-mono">{track.duration}</span>
-                <Play size={16} className="text-piano-ebony/20 group-hover:text-piano-gold transition-colors" />
+                {playingIndex === i ? (
+                  <Pause size={16} className="text-piano-gold" />
+                ) : (
+                  <Play size={16} className="text-piano-ebony/20 group-hover:text-piano-gold transition-colors" />
+                )}
               </div>
             </motion.div>
           ))}
@@ -179,12 +232,12 @@ export const GigCalendar = () => {
                 </div>
               </div>
               <div className="flex items-center justify-between md:justify-end gap-8">
-                <span className={cn(
+                {/* <span className={cn(
                   "text-xs uppercase tracking-widest px-3 py-1 rounded-full border",
                   gig.status === "Sold Out" ? "border-red-500/50 text-red-400" : "border-piano-gold/50 text-piano-gold"
                 )}>
                   {gig.status}
-                </span>
+                </span> */}
                 {/* <button className="p-3 rounded-full bg-piano-ivory text-piano-ebony hover:bg-piano-gold transition-colors">
                   <Play size={16} className="rotate-0" />
                 </button> */}
@@ -255,141 +308,86 @@ export const Gallery = () => {
   );
 };
 
+const WhatsAppIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width={size} 
+    height={size} 
+    fill="currentColor" 
+    className={className}
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+);
+
 export const Contact = () => {
   return (
-    <section id="contact" className="pt-12 pb-24 px-6 max-w-6xl mx-auto piano-pattern">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-        <div>
-          <h2 className="text-4xl font-serif mb-8">Get In Touch</h2>
-          <p className="text-piano-ebony/60 leading-relaxed mb-12">
-            For bookings, session inquiries, or collaboration requests, please use the form or reach out to me directly via social media.
-          </p>
-          
-          <div className="space-y-8">
-            <div className="flex gap-6">
-              <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
-                <Mail size={24} />
-              </div>
-              <div>
-                <h4 className="font-serif text-xl mb-1">Email</h4>
-                <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
-              </div>
-            </div>
+    <section id="contact" className="py-24 px-6 bg-gradient-to-br from-piano-ivory to-piano-gold/5 relative overflow-hidden">
+      <div className="absolute inset-0 piano-pattern opacity-5 pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
+          <div>
+            <h2 className="text-4xl font-serif mb-8">Get In Touch</h2>
+            <p className="text-piano-ebony/60 leading-relaxed mb-12">
+              For bookings, session inquiries, or collaboration requests, please use the form or reach out directly via social media.
+            </p>
             
-            <div className="flex gap-6">
-              <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
-                <MessageSquare size={24} />
+            <div className="space-y-8">
+              <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
+                  <Mail size={24} />
+                </div>
+                <div>
+                  <h4 className="font-serif text-xl mb-1">Email</h4>
+                  <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
+                </div>
               </div>
-              <div>
-                <h4 className="font-serif text-xl mb-1">WhatsApp</h4>
-                <a href="https://wa.me/919527762077" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 95277 62077</a>
+              
+              <div className="flex gap-6">
+                <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
+                  <WhatsAppIcon size={24} />
+                </div>
+                <div>
+                  <h4 className="font-serif text-xl mb-1">WhatsApp</h4>
+                  <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 00000 00000</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-10 rounded-3xl shadow-xl border border-piano-ebony/5">
-          <form className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Name</label>
-                <input type="text" className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors" />
+          
+          <div className="bg-white p-10 rounded-3xl shadow-2xl border border-piano-gold/20">
+            <form className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Name</label>
+                  <input type="text" className="w-full bg-piano-ivory/30 border-b-2 border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors placeholder:text-piano-ebony/20" placeholder="Your Name" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Email</label>
+                  <input type="email" className="w-full bg-piano-ivory/30 border-b-2 border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors placeholder:text-piano-ebony/20" placeholder="your@email.com" />
+                </div>
               </div>
               <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Email</label>
-                <input type="email" className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors" />
+                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Subject</label>
+                <select className="w-full bg-piano-ivory/30 border-b-2 border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors">
+                  <option>Studio Session</option>
+                  <option>Live Performance</option>
+                  <option>Composition Request</option>
+                  <option>Other</option>
+                </select>
               </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Subject</label>
-              <select className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors">
-                <option>Studio Session</option>
-                <option>Live Performance</option>
-                <option>Composition Request</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Message</label>
-              <textarea rows={4} className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors resize-none" />
-            </div>
-            <button className="w-full py-4 bg-piano-ebony text-piano-ivory rounded-xl hover:bg-piano-gold transition-colors font-medium">
-              Send Message
-            </button>
-          </form>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Message</label>
+                <textarea rows={4} className="w-full bg-piano-ivory/30 border-b-2 border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors resize-none placeholder:text-piano-ebony/20" placeholder="How can I help you?" />
+              </div>
+              <button className="w-full py-4 bg-piano-ebony text-piano-ivory rounded-xl hover:bg-piano-gold transition-colors font-medium shadow-lg hover:shadow-piano-gold/20">
+                Send Message
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </section>
   );
 };
 
-export const EPK = () => {
-  return (
-    <section id="epk" className="py-24 px-6 max-w-6xl mx-auto piano-pattern">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-        <div>
-          <h2 className="text-4xl font-serif mb-8">Session Inquiries</h2>
-          <p className="text-piano-ebony/60 leading-relaxed mb-12">
-            Available for studio sessions, live shows,  tour support. Specializing in grand piano, vintage electric pianos, and complex synth & sound programming.
-          </p>
-          
-          <div className="space-y-8">
-            <div className="flex gap-6">
-              <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
-                <FileText size={24} />
-              </div>
-              <div>
-                <h4 className="font-serif text-xl mb-1">Electronic Press Kit</h4>
-                <p className="text-sm text-piano-ebony/40 mb-3">Download high-res photos, bio, and tech rider.</p>
-                <button className="text-sm font-medium text-piano-gold hover:underline">Download EPK (PDF 12MB)</button>
-              </div>
-            </div>
-            
-            <div className="flex gap-6">
-              <div className="w-12 h-12 rounded-xl bg-piano-gold/10 flex items-center justify-center text-piano-gold">
-                <Mail size={24} />
-              </div>
-              <div>
-                <h4 className="font-serif text-xl mb-1">Direct Contact</h4>
-                <p className="text-sm text-piano-ebony/40 mb-3">For booking and collaboration requests.</p>
-                {/* EDIT: Contact Email */}
-                <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white p-10 rounded-3xl shadow-xl border border-piano-ebony/5">
-          <form className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Name</label>
-                <input type="text" className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Email</label>
-                <input type="email" className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Subject</label>
-              <select className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors">
-                <option>Studio Session</option>
-                <option>Live Performance</option>
-                <option>Composition Request</option>
-                <option>Other</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-piano-ebony/40 font-medium">Message</label>
-              <textarea rows={4} className="w-full bg-piano-ivory/50 border-b border-piano-ebony/10 py-2 focus:border-piano-gold outline-none transition-colors resize-none" />
-            </div>
-            <button className="w-full py-4 bg-piano-ebony text-piano-ivory rounded-xl hover:bg-piano-gold transition-colors font-medium">
-              Send Inquiry
-            </button>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
-};
