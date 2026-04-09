@@ -92,8 +92,20 @@ export const Listen = () => {
       setPlayingIndex(null);
     } else {
       if (audioRef.current) {
-        audioRef.current.src = `/${tracks[index].title}.mp3`; 
-        audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+        const trackPath = `/${tracks[index].title}.mp3`;
+        console.log("Playing track:", trackPath);
+        audioRef.current.src = encodeURI(trackPath); 
+        audioRef.current.load();
+        audioRef.current.play().catch(e => {
+          console.error("Audio play failed:", e);
+          // Fallback for local testing if / doesn't work
+          if (e.name === "NotSupportedError" || e.name === "NotAllowedError") {
+            console.log("Retrying with relative path...");
+            audioRef.current!.src = encodeURI(`${tracks[index].title}.mp3`);
+            audioRef.current!.load();
+            audioRef.current!.play().catch(err => console.error("Relative path failed too:", err));
+          }
+        });
         setPlayingIndex(index);
       }
     }
@@ -349,7 +361,7 @@ export const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-serif text-xl mb-1">WhatsApp</h4>
-                  <a href="https://wa.me/+919527762077" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 95277 62077</a>
+                  <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 00000 00000</a>
                 </div>
               </div>
             </div>
