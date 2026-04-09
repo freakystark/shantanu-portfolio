@@ -67,6 +67,8 @@ export const Listen = () => {
     { title: "Bin Tere Sanam", type: "Solo Piano", duration: "1:00" },
     { title: "Gulabi Aakhein", type: "Solo Piano", duration: "1:04" },
     { title: "Mere Rang Mein", type: "Ambient Keys", duration: "1:14" },
+    { title: "Sagar Jaisi Aankhowali", type: "Ambient Keys", duration: "1:16" },
+    { title: "Tere Liye - Veer Zaara", type: "Ambient Keys", duration: "1:21" },
   ];
 
   const [playingIndex, setPlayingIndex] = React.useState<number | null>(null);
