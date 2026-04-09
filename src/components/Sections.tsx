@@ -262,7 +262,7 @@ export const Contact = () => {
         <div>
           <h2 className="text-4xl font-serif mb-8">Get In Touch</h2>
           <p className="text-piano-ebony/60 leading-relaxed mb-12">
-            For bookings, session inquiries, or collaboration requests, please use the form or reach out directly via social media.
+            For bookings, session inquiries, or collaboration requests, please use the form or reach out to me directly via social media.
           </p>
           
           <div className="space-y-8">
@@ -282,7 +282,7 @@ export const Contact = () => {
               </div>
               <div>
                 <h4 className="font-serif text-xl mb-1">WhatsApp</h4>
-                <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 00000 00000</a>
+                <a href="https://wa.me/919527762077" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 95277 62077</a>
               </div>
             </div>
           </div>
