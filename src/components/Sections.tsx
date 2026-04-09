@@ -94,18 +94,25 @@ export const Listen = () => {
       setPlayingIndex(null);
     } else {
       if (audioRef.current) {
-        const trackPath = `/${tracks[index].title}.mp3`;
-        console.log("Playing track:", trackPath);
+        // Use import.meta.env.BASE_URL for GitHub Pages compatibility
+        const baseUrl = import.meta.env.BASE_URL || '/';
+        const fileName = `${tracks[index].title}.mp3`;
+        
+        // Construct the full path correctly
+        const trackPath = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}${fileName}`;
+        
+        console.log("Attempting to play:", trackPath);
+        
         audioRef.current.src = encodeURI(trackPath); 
         audioRef.current.load();
         audioRef.current.play().catch(e => {
           console.error("Audio play failed:", e);
-          // Fallback for local testing if / doesn't work
-          if (e.name === "NotSupportedError" || e.name === "NotAllowedError") {
+          // Fallback: try relative path if absolute fails
+          if (e.name === "NotSupportedError" || e.name === "NotAllowedError" || e.message.includes("404")) {
             console.log("Retrying with relative path...");
-            audioRef.current!.src = encodeURI(`${tracks[index].title}.mp3`);
+            audioRef.current!.src = encodeURI(fileName);
             audioRef.current!.load();
-            audioRef.current!.play().catch(err => console.error("Relative path failed too:", err));
+            audioRef.current!.play().catch(err => console.error("All playback attempts failed:", err));
           }
         });
         setPlayingIndex(index);
@@ -363,7 +370,7 @@ export const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-serif text-xl mb-1">WhatsApp</h4>
-                  <a href="https://wa.me/910000000000" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 00000 00000</a>
+                  <a href="https://wa.me/919527762077" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-piano-gold hover:underline">+91 95277 62077</a>
                 </div>
               </div>
             </div>
