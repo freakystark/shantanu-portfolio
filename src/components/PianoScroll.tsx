@@ -6,9 +6,11 @@ export const PianoScroll = () => {
   const { scrollYProgress } = useScroll();
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [showToast, setShowToast] = useState(false);
   
   const hasReachedBottom = useRef(false);
+  const lastTap = useRef<number>(0);
   const hasCompletedIteration = useRef(false);
   
   // Number of keys to show in the sidebar
@@ -21,7 +23,7 @@ export const PianoScroll = () => {
   const majorScale = [0, 2, 4, 5, 7, 9, 11, 12];
 
   const playNote = (index: number) => {
-    if (!audioCtx || !isSoundEnabled) return;
+    if (!audioCtx || !isSoundEnabled || isAudioPlaying) return;
     
     const now = audioCtx.currentTime;
     
@@ -61,6 +63,14 @@ export const PianoScroll = () => {
       osc.stop(now + 0.8);
     });
   };
+
+  useEffect(() => {
+    const handlePlaybackState = (e: any) => {
+      setIsAudioPlaying(e.detail.isPlaying);
+    };
+    window.addEventListener('audio-playback-state', handlePlaybackState);
+    return () => window.removeEventListener('audio-playback-state', handlePlaybackState);
+  }, []);
 
   useEffect(() => {
     const handleFirstInteraction = () => {
@@ -108,6 +118,15 @@ export const PianoScroll = () => {
     setShowToast(false);
   };
 
+  const handleTouchStart = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      handleDoubleClick();
+    }
+    lastTap.current = now;
+  };
+
   return (
     <>
       <div className={cn(
@@ -119,6 +138,7 @@ export const PianoScroll = () => {
       )}>
         <div 
           onDoubleClick={handleDoubleClick}
+          onTouchStart={handleTouchStart}
           className={cn(
             "flex gap-[1px] md:gap-[2px] pointer-events-auto cursor-pointer",
             "flex-row md:flex-col"
