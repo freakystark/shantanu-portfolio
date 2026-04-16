@@ -55,7 +55,7 @@ export default function App() {
       
       {/* Navigation */}
       <nav className={cn(
-        "fixed top-0 left-0 w-full z-40 px-6 md:px-8 py-6 flex justify-between items-center transition-all duration-300",
+        "fixed top-0 left-0 w-full z-[100] px-6 md:px-8 py-6 flex justify-between items-center transition-all duration-300",
         isScrolled 
           ? "bg-piano-ivory/90 backdrop-blur-md shadow-sm py-4" 
           : "bg-transparent py-6"
@@ -120,7 +120,7 @@ export default function App() {
                 className="fixed top-0 right-0 h-full w-[85%] bg-white z-[60] flex flex-col p-8 md:hidden shadow-2xl"
               >
                   <div className="flex justify-between items-center mb-12">
-                    <div className="flex flex-col leading-none pl-2">
+                    <div className="flex flex-col leading-none">
                       <span className="text-2xl font-serif text-piano-ebony uppercase tracking-tighter">The Piano</span>
                       <span className="text-[10px] font-sans text-piano-gold uppercase tracking-[0.3em]">Project</span>
                     </div>
@@ -145,7 +145,13 @@ export default function App() {
                   ))}
                 </div>
 
-                <div className="mt-auto pt-12 border-t border-piano-ebony/10">
+                <div className="mt-auto pt-8 border-t border-piano-ebony/10">
+                  <div className="mb-8">
+                    <div className="text-xl font-serif tracking-widest uppercase text-piano-gold">
+                      Shantanu Jagirdar
+                    </div>
+                  </div>
+                  
                   <p className="text-[10px] uppercase tracking-widest text-piano-ebony/40 mb-4 font-medium">Connect</p>
                   <div className="flex gap-6">
                     <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-piano-ebony hover:text-piano-gold transition-colors">

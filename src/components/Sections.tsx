@@ -33,19 +33,14 @@ export const Hero = () => {
           </h1>
           <div className="flex flex-col items-center justify-center gap-1 mb-6">
             <span className="font-cursive text-xl md:text-3xl text-piano-ivory/60">By</span>
-            <span className="font-cursive text-4xl md:text-7xl text-piano-gold">Shantanu Jagirdar</span>
+            <span className="font-cursive text-[38px] md:text-7xl text-piano-gold">Shantanu Jagirdar</span>
           </div>
           <div className="mb-10">
             <span className="text-piano-ivory/70 tracking-[0.2em] md:tracking-[0.3em] uppercase text-[10px] md:text-sm font-medium block">
               Concert Pianist, Session Keyboardist & DJ
             </span>
           </div>
-          {/* 
-          <p className="max-w-xl mx-auto text-base md:text-lg text-piano-ivory/70 font-light leading-relaxed mb-10">
-            Crafting sonic landscapes through the timeless resonance of ivory and the modern pulse of synthesis.
-          </p> 
-          */}
-          <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+          <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-8 md:mb-10">
             <a href="#listen" className="px-6 md:px-8 py-2.5 md:py-3 bg-piano-gold text-piano-ebony text-sm md:text-base font-medium rounded-full hover:bg-white transition-colors">
               Listen to Demos
             </a>
@@ -53,6 +48,10 @@ export const Hero = () => {
               Session Inquiries
             </a>
           </div>
+          
+          <p className="max-w-xl mx-auto text-xs md:text-base text-piano-ivory/50 font-light leading-relaxed tracking-wide italic">
+            "Crafting sonic landscapes through the timeless resonance of ivory and the modern pulse of synthesis."
+          </p>
         </motion.div>
       </div>
       
@@ -72,7 +71,7 @@ export const Listen = () => {
   const tracks = [
     { title: "Bin Tere Sanam", type: "Solo Piano", duration: "1:00" },
     { title: "Gulabi Aakhein", type: "Solo Piano", duration: "1:04" },
-    { title: "Mere Rang Mein", type: "Ambient Keys", duration: "1:14" },
+   // { title: "Mere Rang Mein", type: "Ambient Keys", duration: "1:14" },
     { title: "Sagar Jaisi Aankhowali", type: "Ambient Keys", duration: "1:16" },
     { title: "Tere Liye - Veer Zaara", type: "Ambient Keys", duration: "1:21" },
   ];
@@ -422,6 +421,8 @@ export const Contact = () => {
     </section>
   );
 };
+
+
 
 // import React from 'react';
 // import { motion } from 'motion/react';
