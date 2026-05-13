@@ -442,13 +442,15 @@ export const Contact = () => {
 };
 
 
-
-
-
-// import React from 'react';
+// import React, { useEffect, useState, useRef } from 'react';
 // import { motion } from 'motion/react';
-// import { Music, Calendar, Mail, FileText, Play, Pause, Volume2, Instagram, Youtube, Twitter, ExternalLink, Phone, MessageCircle } from 'lucide-react';
+// import { 
+//   Music, Calendar, Mail, FileText, Play, Pause, Volume2, Instagram, 
+//   Youtube, Twitter, ExternalLink, Phone, MessageCircle, Loader2 
+// } from 'lucide-react';
 // import { cn } from '@/src/lib/utils';
+// import { db } from '../firebase';
+// import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 // // =============================================================================
 // // ARTIST PERSONALIZATION SECTION
@@ -484,10 +486,10 @@ export const Contact = () => {
 //           </div>
 //           <div className="mb-10">
 //             <span className="text-piano-ivory/70 tracking-[0.2em] md:tracking-[0.3em] uppercase text-[10px] md:text-sm font-medium block">
-//               Concert Pianist, Session Keyboardist & DJ
+//               Concert Pianist, Session Keyboardist & Performer
 //             </span>
 //           </div>
-//           <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-8 md:mb-10">
+//           <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-10">
 //             <a href="#listen" className="px-6 md:px-8 py-2.5 md:py-3 bg-piano-gold text-piano-ebony text-sm md:text-base font-medium rounded-full hover:bg-white transition-colors">
 //               Listen to Demos
 //             </a>
@@ -496,9 +498,11 @@ export const Contact = () => {
 //             </a>
 //           </div>
           
-//           <p className="max-w-xl mx-auto text-xs md:text-base text-piano-ivory/50 font-light leading-relaxed tracking-wide italic">
-//             "Crafting sonic landscapes through the timeless resonance of ivory and the modern pulse of synthesis."
-//           </p>
+//           <div className="px-6">
+//             <p className="max-w-xl mx-auto text-sm md:text-lg text-piano-ivory/60 font-light leading-relaxed italic border-t border-piano-ivory/10 pt-8">
+//               "Crafting sonic landscapes through the timeless resonance of ivory and the modern pulse of synthesis. Available world over."
+//             </p>
+//           </div>
 //         </motion.div>
 //       </div>
       
@@ -514,20 +518,30 @@ export const Contact = () => {
 // };
 
 // export const Listen = () => {
-//   {/* EDIT: Track List Data */}
-//   const tracks = [
-//     { title: "Bin Tere Sanam", type: "Solo Piano", duration: "1:00" },
-//     { title: "Gulabi Aakhein", type: "Solo Piano", duration: "1:04" },
-//    // { title: "Mere Rang Mein", type: "Ambient Keys", duration: "1:14" },
-//     { title: "Sagar Jaisi Aankhowali", type: "Ambient Keys", duration: "1:16" },
-//     { title: "Tere Liye - Veer Zaara", type: "Ambient Keys", duration: "1:21" },
-//   ];
+//   const [tracks, setTracks] = useState<any[]>([]);
+//   const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+//   const [progress, setProgress] = useState(0);
+//   const [isLoading, setIsLoading] = useState(false);
+//   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-//   const [playingIndex, setPlayingIndex] = React.useState<number | null>(null);
-//   const [progress, setProgress] = React.useState(0);
-//   const audioRef = React.useRef<HTMLAudioElement | null>(null);
+//   useEffect(() => {
+//     const q = query(collection(db, 'tracks'), orderBy('order', 'asc'));
+//     return onSnapshot(q, (snapshot) => {
+//       const fetchedTracks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+//       setTracks(fetchedTracks);
+      
+//       // Preload first two tracks
+//       fetchedTracks.slice(0, 2).forEach(track => {
+//         const link = document.createElement('link');
+//         link.rel = 'preload';
+//         link.as = 'audio';
+//         link.href = (track as any).audioUrl;
+//         document.head.appendChild(link);
+//       });
+//     });
+//   }, []);
 
-//   React.useEffect(() => {
+//   useEffect(() => {
 //     let interval: any;
 //     if (playingIndex !== null) {
 //       interval = setInterval(() => {
@@ -542,34 +556,24 @@ export const Contact = () => {
 
 //   const handlePlay = (index: number) => {
 //     if (playingIndex === index) {
-//       audioRef.current?.pause();
-//       setPlayingIndex(null);
-//       window.dispatchEvent(new CustomEvent('audio-playback-state', { detail: { isPlaying: false } }));
+//       if (audioRef.current?.paused) {
+//         audioRef.current?.play();
+//       } else {
+//         audioRef.current?.pause();
+//       }
+//       // Re-triggering state update for icon toggle is handled by audio events mostly,
+//       // but manually setting playingIndex null on pause is standard in this component logic
+//       if (audioRef.current?.paused) setPlayingIndex(null);
 //     } else {
 //       if (audioRef.current) {
-//         // Use import.meta.env.BASE_URL for GitHub Pages compatibility
-//         const baseUrl = import.meta.env.BASE_URL || '/';
-//         const fileName = `${tracks[index].title}.mp3`;
-//         // Ensure no double slashes
-//         const trackPath = `${baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'}${fileName}`;
-        
-//         console.log("Attempting to play:", trackPath);
-        
-//         audioRef.current.src = encodeURI(trackPath); 
+//         setIsLoading(true);
+//         audioRef.current.src = tracks[index].audioUrl;
 //         audioRef.current.load();
 //         audioRef.current.play().then(() => {
-//           window.dispatchEvent(new CustomEvent('audio-playback-state', { detail: { isPlaying: true } }));
+//           setIsLoading(false);
 //         }).catch(e => {
 //           console.error("Audio play failed:", e);
-//           // Fallback: try relative path if absolute fails
-//           if (e.name === "NotSupportedError" || e.name === "NotAllowedError" || e.message.includes("404")) {
-//             console.log("Retrying with relative path...");
-//             audioRef.current!.src = encodeURI(fileName);
-//             audioRef.current!.load();
-//             audioRef.current!.play().then(() => {
-//               window.dispatchEvent(new CustomEvent('audio-playback-state', { detail: { isPlaying: true } }));
-//             }).catch(err => console.error("All playback attempts failed:", err));
-//           }
+//           setIsLoading(false);
 //         });
 //         setPlayingIndex(index);
 //       }
@@ -623,9 +627,13 @@ export const Contact = () => {
 //               <button 
 //                 onClick={() => playingIndex !== null && handlePlay(playingIndex)}
 //                 className="w-12 h-12 rounded-full bg-piano-gold text-piano-ebony flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-piano-gold/20 disabled:opacity-50"
-//                 disabled={playingIndex === null}
+//                 disabled={playingIndex === null || isLoading}
 //               >
-//                 {playingIndex !== null ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />}
+//                 {isLoading ? (
+//                   <Loader2 className="animate-spin" size={24} />
+//                 ) : (
+//                   playingIndex !== null ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" className="ml-1" />
+//                 )}
 //               </button>
 //             </div>
 //           </div>
@@ -649,7 +657,14 @@ export const Contact = () => {
 //               <div className="flex items-center gap-6">
 //                 <span className="text-sm font-serif text-piano-ebony/20">0{i + 1}</span>
 //                 <div>
-//                   <h3 className={cn("font-medium text-lg transition-colors", playingIndex === i ? "text-piano-gold" : "group-hover:text-piano-gold")}>{track.title}</h3>
+//                   <div className="flex items-center gap-2 mb-1">
+//                     <h3 className={cn("font-medium text-lg transition-colors", playingIndex === i ? "text-piano-gold" : "group-hover:text-piano-gold")}>{track.title}</h3>
+//                     {track.tag && track.tag !== 'none' && (
+//                       <span className="text-[8px] bg-piano-gold/10 text-piano-gold px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter">
+//                         {track.tag}
+//                       </span>
+//                     )}
+//                   </div>
 //                   <p className="text-sm text-piano-ebony/40">{track.type}</p>
 //                 </div>
 //               </div>
@@ -670,13 +685,14 @@ export const Contact = () => {
 // };
 
 // export const GigCalendar = () => {
-//   {/* EDIT: Gig List Data */}
-//   const gigs = [
-//     { date: "APR 15", venue: "De Mora", location: "Pune", status: "Tickets Available" },
-//     { date: "MAY 02", venue: "Brew Merchant", location: "Pune", status: "Tickets Available" },
-//     { date: "MAY 18", venue: "Ritz Carlton", location: "London", status: "Tickets Available" },
-//     { date: "JUN 15", venue: "Conrad", location: "Bengaluru", status: "Tickets Available" },
-//   ];
+//   const [gigs, setGigs] = useState<any[]>([]);
+
+//   useEffect(() => {
+//     const q = query(collection(db, 'gigs'), orderBy('timestamp', 'desc'));
+//     return onSnapshot(q, (snapshot) => {
+//       setGigs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+//     });
+//   }, []);
 
 //   return (
 //     <section id="gigs" className="bg-piano-ebony py-24 text-piano-ivory">
@@ -729,14 +745,14 @@ export const Contact = () => {
 // };
 
 // export const Gallery = () => {
-//   const items = [
-//     { type: 'image', url: 'https://images.unsplash.com/photo-1552422535-c45813c61732?q=80&w=2070&auto=format&fit=crop', title: 'Live at The Blue Note' },
-//     { type: 'video', url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop', title: 'Studio Session - Neon Pulse' },
-//     { type: 'image', url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop', title: 'Synthesizer Rig Setup' },
-//     { type: 'image', url: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=2070&auto=format&fit=crop', title: 'Concert Hall Rehearsal' },
-//     { type: 'video', url: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070&auto=format&fit=crop', title: 'DJ Set - After Hours' },
-//     { type: 'image', url: 'https://images.unsplash.com/photo-1520529611473-d58ff3f47a3e?q=80&w=2070&auto=format&fit=crop', title: 'Grand Piano Detail' },
-//   ];
+//   const [items, setItems] = useState<any[]>([]);
+
+//   useEffect(() => {
+//     const q = query(collection(db, 'gallery'), orderBy('order', 'desc'));
+//     return onSnapshot(q, (snapshot) => {
+//       setItems(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+//     });
+//   }, []);
 
 //   return (
 //     <section id="gallery" className="pt-20 md:pt-24 pb-12 px-6 max-w-7xl mx-auto">
@@ -817,7 +833,7 @@ export const Contact = () => {
 //                 </div>
 //                 <div>
 //                   <h4 className="font-serif text-xl mb-1">Email</h4>
-//                   <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
+//                   <a href="mailto:booking@thepianoproject.in" className="text-sm font-medium text-piano-gold hover:underline">booking@thepianoproject.in</a>
 //                 </div>
 //               </div>
               
@@ -868,3 +884,9 @@ export const Contact = () => {
 //     </section>
 //   );
 // };
+
+
+
+
+
+
