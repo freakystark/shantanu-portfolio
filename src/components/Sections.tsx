@@ -477,7 +477,7 @@ export const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl md:text-9xl font-serif mb-6 leading-[0.9] uppercase tracking-tighter">
+          <h1 className="text-5xl md:text-9xl font-serif mb-6 leading-[0.9] uppercase tracking-tighter">
             The Piano <br /> <span className="text-piano-gold">Project</span>
           </h1>
           <div className="flex flex-col items-center justify-center gap-1 mb-6">
@@ -500,7 +500,7 @@ export const Hero = () => {
           
           <div className="px-6">
             <p className="max-w-xl mx-auto text-sm md:text-lg text-piano-ivory/60 font-light leading-relaxed italic border-t border-piano-ivory/10 pt-8">
-              "Crafting sonic landscapes through the timeless resonance of ivory and the modern pulse of synthesis. Available world over."
+              "Performing in India and Worlwide, solo and in bands. Reach out for more details!"
             </p>
           </div>
         </motion.div>
@@ -553,6 +553,27 @@ export const Listen = () => {
     }
     return () => clearInterval(interval);
   }, [playingIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handlePlayStateChange = () => {
+      window.dispatchEvent(new CustomEvent('audio-playback-state', { 
+        detail: { isPlaying: !audio.paused } 
+      }));
+    };
+
+    audio.addEventListener('play', handlePlayStateChange);
+    audio.addEventListener('pause', handlePlayStateChange);
+    audio.addEventListener('ended', handlePlayStateChange);
+
+    return () => {
+      audio.removeEventListener('play', handlePlayStateChange);
+      audio.removeEventListener('pause', handlePlayStateChange);
+      audio.removeEventListener('ended', handlePlayStateChange);
+    };
+  }, []);
 
   const handlePlay = (index: number) => {
     if (playingIndex === index) {
@@ -833,7 +854,7 @@ export const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-serif text-xl mb-1">Email</h4>
-                  <a href="mailto:booking@thepianoproject.in" className="text-sm font-medium text-piano-gold hover:underline">booking@thepianoproject.in</a>
+                  <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
                 </div>
               </div>
               
@@ -884,6 +905,8 @@ export const Contact = () => {
     </section>
   );
 };
+
+
 
 
 
