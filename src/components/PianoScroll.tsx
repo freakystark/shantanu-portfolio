@@ -182,7 +182,7 @@ export const PianoScroll = () => {
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 bg-piano-ebony/80 backdrop-blur-md text-piano-ivory rounded-full border border-piano-gold/30 text-sm font-medium shadow-2xl pointer-events-none text-center max-w-[90vw]"
           >
             Scrolling sound will be disabled for now, <br className="md:hidden" />
-            please click the piano scroll twice to enable it again.
+            please click the piano scroll twice to enable it again!
           </motion.div>
         )}
       </AnimatePresence>

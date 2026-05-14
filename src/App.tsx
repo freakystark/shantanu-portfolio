@@ -175,7 +175,7 @@ export default function App() {
                   
                   <p className="text-[10px] uppercase tracking-widest text-piano-ebony/40 mb-4 font-medium">Connect</p>
                   <div className="flex gap-6">
-                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-piano-ebony hover:text-piano-gold transition-colors">
+                    <a href="https://instagram.com/shantanu_keys/" target="_blank" rel="noopener noreferrer" className="text-piano-ebony hover:text-piano-gold transition-colors">
                       <Instagram size={24} />
                     </a>
                     <a href="https://wa.me/919527762077" target="_blank" rel="noopener noreferrer" className="text-piano-ebony hover:text-piano-gold transition-colors">
@@ -219,7 +219,7 @@ export default function App() {
 
         {/* Social Links */}
         <div className="flex justify-center gap-6 md:gap-8 mb-10 md:mb-12">
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2.5 md:p-3 rounded-full border border-piano-ebony/10 hover:border-piano-gold hover:text-piano-gold transition-all">
+          <a href="https://instagram.com/shantanu_keys/" target="_blank" rel="noopener noreferrer" className="p-2.5 md:p-3 rounded-full border border-piano-ebony/10 hover:border-piano-gold hover:text-piano-gold transition-all">
             <Instagram size={20} />
           </a>
           <a href="https://wa.me/919527762077" target="_blank" rel="noopener noreferrer" className="p-2.5 md:p-3 rounded-full border border-piano-ebony/10 hover:border-piano-gold hover:text-piano-gold transition-all">
