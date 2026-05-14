@@ -477,7 +477,7 @@ export const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-9xl font-serif mb-6 leading-[0.9] uppercase tracking-tighter">
+          <h1 className="text-6xl md:text-9xl font-serif mb-6 leading-[0.9] uppercase tracking-tighter">
             The Piano <br /> <span className="text-piano-gold">Project</span>
           </h1>
           <div className="flex flex-col items-center justify-center gap-1 mb-6">
