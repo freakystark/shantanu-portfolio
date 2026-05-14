@@ -6,6 +6,7 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "cleanUrls": true,
     "rewrites": [
       {
         "source": "**",
@@ -20,3 +21,4 @@
     "rules": "storage.rules"
   }
 }
+
