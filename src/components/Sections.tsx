@@ -854,7 +854,7 @@ export const Contact = () => {
                 </div>
                 <div>
                   <h4 className="font-serif text-xl mb-1">Email</h4>
-                  <a href="mailto:booking@shantanujagirdar.com" className="text-sm font-medium text-piano-gold hover:underline">booking@shantanujagirdar.com</a>
+                  <a href="mailto:shantanu@thepianoproject.in" className="text-sm font-medium text-piano-gold hover:underline">shantanu@thepianoproject.in</a>
                 </div>
               </div>
               
